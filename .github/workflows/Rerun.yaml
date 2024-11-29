@@ -1,0 +1,45 @@
+name: Rerun
+
+on:
+  workflow_run:
+    workflows:
+      - Deploy
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  no_operation_job:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clean old run log
+        id: clean_old_run
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          GITHUB_API_URL: https://api.github.com
+        run: |
+          API_URL=${GITHUB_API_URL:-"https://api.github.com"}
+          WORKFLOW_ID=$(gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r ".workflows[] | select(.name == \"${GITHUB_WORKFLOW}\") | .id")
+
+          gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_ID}/runs" \
+            | jq -r --arg CURRENT_RUN_ID "$GITHUB_RUN_ID" '.workflow_runs[] | select(.id != ($CURRENT_RUN_ID | tonumber) and .status != "in_progress" and .status != "queued") | .id' \
+            | while read -r RUN_ID; do
+                echo "Deleting workflow run ID: $RUN_ID"
+                gh api -X DELETE "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" && \
+                echo "Deleted $RUN_ID" || echo "Failed to delete $RUN_ID"
+            done
+
+      - name: Check have running workflow
+        id: check_running_workflow
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          GITHUB_API_URL: https://api.github.com
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          API_URL=${GITHUB_API_URL:-"https://api.github.com"}
+          WORKFLOW_ID=$(gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r ".workflows[] | select(.name == \"${WORKFLOW_NAME}\") | .id")
+          gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_ID}/runs" | jq -e '.workflow_runs[] | select(.status == "in_progress")' >/dev/null && echo "Running workflows detected. Exiting." && exit 1 || echo "No running workflows found."
+          gh api -X POST "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_NAME}.yaml/dispatches" -F ref=main

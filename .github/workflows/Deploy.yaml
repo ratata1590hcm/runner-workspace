@@ -1,0 +1,74 @@
+name: Deploy
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Build Success and Proceed Conditionally
+        run: |
+          if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+            echo "Build was successful,start the deploy."
+            echo "DEPLOY=true" >> $GITHUB_OUTPUT
+            exit
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "This workflow was manually triggered"
+            echo "DEPLOY=true" >> $GITHUB_OUTPUT
+            exit
+          else
+            echo "This workflow was triggered by another event skipping"
+          fi
+        id: check_success
+
+      - name: Clean old run log
+        id: clean_old_run
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          GITHUB_API_URL: https://api.github.com
+        run: |
+          API_URL=${GITHUB_API_URL:-"https://api.github.com"}
+          WORKFLOW_ID=$(gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r ".workflows[] | select(.name == \"${GITHUB_WORKFLOW}\") | .id")
+
+          gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_ID}/runs" \
+            | jq -r --arg CURRENT_RUN_ID "$GITHUB_RUN_ID" '.workflow_runs[] | select(.id != ($CURRENT_RUN_ID | tonumber) and (.status == "in_progress" or .status == "queued")) | .id' \
+            | while read -r RUN_ID; do
+                echo "Cancelling workflow run ID: $RUN_ID"
+                if gh api -X POST "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/cancel"; then
+                  echo "Successfully cancelled workflow run ID: $RUN_ID"
+                else
+                  echo "Failed to cancel workflow run ID: $RUN_ID"
+                fi
+            done
+
+          gh api "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_ID}/runs" \
+            | jq -r --arg CURRENT_RUN_ID "$GITHUB_RUN_ID" '.workflow_runs[] | select(.id != ($CURRENT_RUN_ID | tonumber)) | .id' \
+            | while read -r RUN_ID; do
+                echo "Deleting workflow run ID: $RUN_ID"
+                gh api -X DELETE "${API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" && \
+                echo "Deleted $RUN_ID" || echo "Failed to delete $RUN_ID"
+            done
+
+      - name: Clean up disk
+        id: clean_disk
+        run: |
+          docker run -v /:/host_machine bash -c "rm -rf /host_machine/opt/hostedtoolcache /host_machine/usr/local/lib/android /host_machine/usr/local/share/powershell"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - uses: actions/checkout@v4
+
+      - name: Deploy compose
+        if: steps.check_success.outputs.DEPLOY == 'true'
+        env:
+          PASSWORD: ${{ secrets.PASSWORD }}
+          FM_HOME: ${{ secrets.FM_HOME }}
+        uses: ./.github/actions/compose
+        with:
+          base_path: compose
+          skip_composedown: true
