@@ -112,7 +112,7 @@ runs:
       run: |
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
-        sleep 30
+        sleep 60
         docker compose -f ${{ inputs.compose_file }} logs
         sleep ${{ inputs.timewait }}
 
