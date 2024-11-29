@@ -50,7 +50,7 @@ runs:
         TIMEOUT=${{ inputs.timeout }}
         START_TIME=$(date +%s)
         END_TIME=$((START_TIME + TIMEOUT))
-        SLEEP_INTERVAL=60
+        SLEEP_INTERVAL=5
 
         # Function to check health status of all services
         check_services_status() {
@@ -112,6 +112,7 @@ runs:
       run: |
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
+        sleep 30
         docker compose -f ${{ inputs.compose_file }} logs
         sleep ${{ inputs.timewait }}
 
