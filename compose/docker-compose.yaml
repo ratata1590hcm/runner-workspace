@@ -28,8 +28,3 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${PWD}:${PWD}
     entrypoint: docker compose exec desktop bash -c "autossh -M 0 -R 80:localhost:3000 serveo.net"
-    healthcheck:
-      test: ["CMD", "sh", "-c", "docker logs $(hostname) 2>&1 | grep -q 'Forwarding HTTP traffic from https:'"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
