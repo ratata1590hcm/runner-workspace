@@ -9,13 +9,12 @@ services:
       PGID: 0
       START_DOCKER: false
       PASSWORD: ${PASSWORD}
-      FM_HOME: ${FM_HOME}
+      FM_HOME: /workspace
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
       - /mnt:/mnt
       - /:/hostmachine
-      - ${FM_HOME}:${FM_HOME}
     network_mode: host
     shm_size: 4gb
     restart: always
@@ -23,8 +22,8 @@ services:
   serveo:
     image: docker:latest
     restart: always
-    working_dir: ${PWD}
+    working_dir: /conpose
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${PWD}:${PWD}
+      - ./:/compose
     entrypoint: docker compose exec desktop bash -c "chmod 644 /root/.ssh/config && autossh -M 0 -R 80:localhost:3000 serveo.net"
