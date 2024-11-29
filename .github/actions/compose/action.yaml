@@ -92,6 +92,7 @@ runs:
                 exit 0
             elif [ "$status" = "unhealthy" ]; then
                 echo "At least one service is unhealthy."
+                docker compose -f ${{ inputs.compose_file }} logs
                 exit 1
             fi
 
