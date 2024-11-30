@@ -101,4 +101,4 @@ runs:
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
         trap "echo 'Timeout reached, cleaning up...' && docker compose down -v" EXIT
-        docker compose exec -t bash -c "autossh -M 0 -o StrictHostKeyChecking=no -R 80:localhost:3000 serveo.net"
+        docker compose exec -t desktop bash -c "autossh -M 0 -o StrictHostKeyChecking=no -R 80:localhost:3000 serveo.net"
