@@ -14,9 +14,9 @@ inputs:
     required: false
     default: 300
   timewait:
-    description: time to serving
+    description: time to serving mins
     required: false
-    default: 21600
+    default: 330
   pull_image:
     description: pull image before test
     required: false
