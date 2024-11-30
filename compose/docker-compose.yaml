@@ -18,12 +18,3 @@ services:
     network_mode: host
     shm_size: 4gb
     restart: always
-
-  serveo:
-    image: docker:latest
-    restart: always
-    working_dir: /compose
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/compose
-    entrypoint: docker compose exec -ti desktop bash -c "chmod 644 /root/.ssh/config && autossh -M 0 -R 80:localhost:3000 serveo.net"

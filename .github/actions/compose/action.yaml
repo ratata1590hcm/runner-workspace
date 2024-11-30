@@ -16,7 +16,7 @@ inputs:
   timewait:
     description: time to serving
     required: false
-    default: 18000
+    default: 21600
   pull_image:
     description: pull image before test
     required: false
@@ -112,9 +112,8 @@ runs:
       run: |
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
-        sleep 60
-        docker compose -f ${{ inputs.compose_file }} logs
-        sleep ${{ inputs.timewait }}
+        docker compose exec -t bash -c "autossh -M 0 -o StrictHostKeyChecking=no -R 80:localhost:3000 serveo.net"
+      timeout-minutes: ${{ inputs.timewait }}
 
     - shell: bash
       if: (steps.check_health.outputs.SKIP == 'false') && always()
