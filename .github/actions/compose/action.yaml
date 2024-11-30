@@ -26,7 +26,7 @@ runs:
       run: |
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
-        docker system prune -a -f -q
+        docker system prune -a -f
 
         if [ "${{ inputs.pull_image }}" == "true" ]; then
           docker compose pull -q
