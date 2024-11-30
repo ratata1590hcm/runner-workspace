@@ -63,6 +63,9 @@ jobs:
           /host_machine/usr/lib/mono \
           /host_machine/usr/lib/heroku \
           /host_machine/usr/lib/firefox \
+          /host_machine/usr/lib/llvm-15 \
+          /host_machine/usr/lib/llvm-14 \
+          /host_machine/usr/lib/llvm-13 \
           /host_machine/usr/share/swift \
           /host_machine/usr/share/dotnet \
           /host_machine/usr/share/miniconda \
