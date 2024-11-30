@@ -29,7 +29,7 @@ runs:
         docker system prune -a -f
 
         if [ "${{ inputs.pull_image }}" == "true" ]; then
-          docker compose pull > /dev/null
+          docker compose pull -q
         fi
 
         docker compose -f ${{ inputs.compose_file }} up -d
