@@ -10,6 +10,8 @@ services:
       START_DOCKER: false
       PASSWORD: ${PASSWORD}
       FM_HOME: /workspace
+      GIT_USER: workspace
+      GIT_EMAIL: workspace@gmail.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
