@@ -13,18 +13,10 @@ inputs:
     description: timeout to wait
     required: false
     default: 300
-  timewait:
-    description: time to serving mins
-    required: false
-    default: 330
   pull_image:
     description: pull image before test
     required: false
     default: true
-  skip_composedown:
-    description: deploy mode will skip compose down
-    required: false
-    default: false
 
 runs:
   using: composite
@@ -41,10 +33,6 @@ runs:
         fi
 
         docker compose -f ${{ inputs.compose_file }} up -d
-        echo "SKIP=false" >> $GITHUB_OUTPUT
-        if [ "${{ inputs.skip_composedown }}" == "true" ]; then
-          echo "SKIP=true" >> $GITHUB_OUTPUT
-        fi
 
         # Timeout in seconds
         TIMEOUT=${{ inputs.timeout }}
@@ -112,12 +100,5 @@ runs:
       run: |
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
+        trap "echo 'Timeout reached, cleaning up...' && docker compose down -v" EXIT
         docker compose exec -t bash -c "autossh -M 0 -o StrictHostKeyChecking=no -R 80:localhost:3000 serveo.net"
-      timeout-minutes: ${{ inputs.timewait }}
-
-    - shell: bash
-      if: (steps.check_health.outputs.SKIP == 'false') && always()
-      run: |
-        cd ${{ github.workspace }}
-        cd ${{ inputs.base_path }}
-        docker compose -f ${{ inputs.compose_file }} down -v

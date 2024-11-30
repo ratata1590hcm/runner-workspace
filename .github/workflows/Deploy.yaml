@@ -88,4 +88,4 @@ jobs:
         uses: ./.github/actions/compose
         with:
           base_path: compose
-          skip_composedown: true
+        timeout-minutes: 330
