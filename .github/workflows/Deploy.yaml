@@ -53,7 +53,24 @@ jobs:
       - name: Clean up disk
         id: clean_disk
         run: |
-          docker run -v /:/host_machine bash -c "rm -rf /host_machine/opt/hostedtoolcache /host_machine/usr/local/lib/android /host_machine/usr/local/share/powershell"
+          docker run -v /:/host_machine bash -c "rm -rf \
+          /host_machine/opt/hostedtoolcache \
+          /host_machine/usr/local/lib/android \
+          /host_machine/usr/local/share/powershell \
+          /host_machine/usr/lib/jvm \
+          /host_machine/usr/lib/google-cloud-sdk \
+          /host_machine/usr/lib/gcc \
+          /host_machine/usr/lib/mono \
+          /host_machine/usr/lib/heroku \
+          /host_machine/usr/lib/firefox \
+          /host_machine/usr/share/swift \
+          /host_machine/usr/share/dotnet \
+          /host_machine/usr/share/miniconda \
+          /host_machine/usr/share/az_12.1.0 \
+          /host_machine/usr/share/sbt \
+          /host_machine/usr/share/gradle-8.11.1 \
+          /host_machine/usr/local/julia1.11.1 \
+          /host_machine/usr/local/share/chromium "
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
