@@ -91,4 +91,4 @@ jobs:
         uses: ./.github/actions/compose
         with:
           base_path: compose
-        timeout-minutes: 330
+        timeout-minutes: 345
