@@ -17,6 +17,7 @@ services:
       - /var/lib/docker:/var/lib/docker
       - /mnt:/mnt
       - /mnt/workspace:/workspace
+      - /config:/docker_home
       - /:/hostmachine
     network_mode: host
     shm_size: 4gb
