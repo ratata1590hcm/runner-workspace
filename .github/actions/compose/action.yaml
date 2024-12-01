@@ -26,10 +26,12 @@ runs:
       run: |
         cd ${{ github.workspace }}
         cd ${{ inputs.base_path }}
-        docker system prune -a -f
+        docker system prune -a -f > /dev/null
+        echo "cleaned"
 
         if [ "${{ inputs.pull_image }}" == "true" ]; then
           docker compose pull -q
+          echo "pulled"
         fi
 
         docker compose -f ${{ inputs.compose_file }} up -d
