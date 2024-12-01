@@ -9,7 +9,7 @@ services:
       PGID: 0
       START_DOCKER: false
       PASSWORD: ${PASSWORD}
-      FM_HOME: /workspace
+      FM_HOME: /mnt
       GIT_USER: workspace
       GIT_EMAIL: workspace@gmail.com
     volumes:
