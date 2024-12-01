@@ -9,13 +9,14 @@ services:
       PGID: 0
       START_DOCKER: false
       PASSWORD: ${PASSWORD}
-      FM_HOME: /mnt
+      FM_HOME: /workspace
       GIT_USER: workspace
       GIT_EMAIL: workspace@gmail.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
       - /mnt:/mnt
+      - /mnt/workspace:/workspace
       - /:/hostmachine
     network_mode: host
     shm_size: 4gb
