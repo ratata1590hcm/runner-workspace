@@ -92,3 +92,9 @@ jobs:
         with:
           base_path: compose
         timeout-minutes: 345
+        continue-on-error: true
+
+      - name: Exit
+        run: |
+          docker compose down -v
+          exit 0
