@@ -104,4 +104,5 @@ runs:
         cd ${{ inputs.base_path }}
         trap "echo 'Timeout reached, cleaning up...' && docker compose down -v" EXIT
         # docker compose exec -t desktop bash -c "chmod 644 /root/.ssh/config && autossh -M 0 -o StrictHostKeyChecking=no -N -R 80:localhost:3000 serveo.net"
-        docker compose exec -t desktop script -qfc "chmod 644 /root/.ssh/config && autossh -M 0 -o StrictHostKeyChecking=no -N -R 80:localhost:3000 serveo.net" /dev/null
+        echo "tunneling..."
+        docker compose exec -t desktop script -qfc "chmod 644 /root/.ssh/config && autossh -M 0 -o StrictHostKeyChecking=no -N -R 80:localhost:3000 serveo.net" /dev/tty
