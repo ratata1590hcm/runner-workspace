@@ -19,6 +19,8 @@ services:
       - /mnt/workspace:/workspace
       - /config:/docker_home
       - /:/hostmachine
-    network_mode: host
+    # network_mode: host
+    ports:
+      - 3000:3000
     shm_size: 4gb
     restart: always
