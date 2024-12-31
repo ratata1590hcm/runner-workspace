@@ -16,6 +16,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
       - /mnt:/mnt
+      - /mnt/workspace:/mnt/workspace
       - /:/hostmachine
     # network_mode: host
     ports:
